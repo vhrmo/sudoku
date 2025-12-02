@@ -27,6 +27,7 @@ let gameState = {
 
 let timerInterval = null;
 let lastKeyPress = { key: null, time: 0 };
+let lastModifierPress = { key: null, time: 0 };
 
 // DOM Elements
 let boardElement;
@@ -375,12 +376,35 @@ function handleCellContextMenu(index, e) {
  * @param {KeyboardEvent} e - Keyboard event
  */
 function handleKeyDown(e) {
+    const key = e.key;
+    const now = Date.now();
+
+    // Handle Ctrl+Enter or Cmd+Enter for validation (works anytime)
+    if (key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        validateBoard();
+        return;
+    }
+
+    // Handle double-press of modifier keys (Ctrl, Alt, Meta) for auto-fill
+    if (key === 'Control' || key === 'Alt' || key === 'Meta') {
+        if (lastModifierPress.key === key && now - lastModifierPress.time < 300) {
+            // Double-press detected - trigger auto-fill on selected cell
+            if (gameState.selectedCell !== null && !gameState.isCompleted) {
+                autoFillPossibleNumbers(gameState.selectedCell);
+            }
+            lastModifierPress = { key: null, time: 0 };
+        } else {
+            lastModifierPress = { key, time: now };
+        }
+        return;
+    }
+
     if (gameState.selectedCell === null || gameState.isCompleted) return;
 
     const index = gameState.selectedCell;
     const row = Math.floor(index / 9);
     const col = index % 9;
-    const key = e.key;
     const isInitialCell = gameState.puzzle[row][col] !== 0;
 
     // Handle arrow key navigation (works on all cells including pre-filled ones)
@@ -407,7 +431,6 @@ function handleKeyDown(e) {
 
     if (key >= '1' && key <= '9') {
         const num = parseInt(key);
-        const now = Date.now();
         
         // Check for double-press (same key within 300ms) or shift key
         if (e.shiftKey || (lastKeyPress.key === key && now - lastKeyPress.time < 300)) {
