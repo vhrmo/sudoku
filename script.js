@@ -183,7 +183,7 @@ function shuffleArray(array) {
 function generatePuzzle(solution, difficulty) {
     const puzzle = solution.map(row => [...row]);
     const cellsToRemove = DIFFICULTY_LEVELS[difficulty].cellsToRemove;
-    
+
     // Create array of all cell positions and shuffle
     let positions = [];
     for (let i = 0; i < 81; i++) {
@@ -209,7 +209,7 @@ function generatePuzzle(solution, difficulty) {
  */
 function startNewGame() {
     const difficulty = difficultySelect.value;
-    
+
     gameState.solution = generateSolution();
     gameState.puzzle = generatePuzzle(gameState.solution, difficulty);
     gameState.userValues = gameState.puzzle.map(row => [...row]);
@@ -222,7 +222,7 @@ function startNewGame() {
     gameState.showErrors = false;
 
     statusElement.textContent = '';
-    
+
     renderBoard();
     startTimer();
     saveGameState();
@@ -241,7 +241,7 @@ function resetGame() {
     gameState.showErrors = false;
 
     statusElement.textContent = '';
-    
+
     renderBoard();
     startTimer();
     saveGameState();
@@ -294,7 +294,7 @@ function createCellElement(index, row, col) {
         // User-filled cell
         cell.classList.add('user-value');
         cell.innerHTML = `<span class="main-value">${userValue}</span>`;
-        
+
         // Check if the value is correct (only show errors when showErrors is true)
         if (gameState.showErrors && userValue !== gameState.solution[row][col]) {
             cell.classList.add('error');
@@ -341,10 +341,10 @@ function createPossibleNumbersHTML(possibleNums) {
  */
 function handleCellClick(index, e) {
     hideContextMenu();
-    
+
     const row = Math.floor(index / 9);
     const col = index % 9;
-    
+
     // Don't allow selection of initial cells for editing
     gameState.selectedCell = index;
     renderBoard();
@@ -503,7 +503,7 @@ function handleKeyDown(e) {
         if (lastModifierPress.key === key && now - lastModifierPress.time < 300) {
             // Double-press detected - trigger auto-fill on selected cell
             if (gameState.selectedCell !== null && !gameState.isCompleted) {
-                autoFillPossibleNumbers(gameState.selectedCell);
+                handleCellDoubleClick(gameState.selectedCell);
             }
             lastModifierPress = { key: null, time: 0 };
         } else {
@@ -543,7 +543,7 @@ function handleKeyDown(e) {
 
     if (key >= '1' && key <= '9') {
         const num = parseInt(key);
-        
+
         // Check for double-press (same key within 300ms) or shift key
         if (e.shiftKey || (lastKeyPress.key === key && now - lastKeyPress.time < 300)) {
             // Enter as final value
@@ -552,7 +552,7 @@ function handleKeyDown(e) {
             // Toggle as possible number
             togglePossibleNumber(index, num);
         }
-        
+
         lastKeyPress = { key, time: now };
     } else if (key === 'Delete' || key === 'Backspace') {
         clearCell(index);
@@ -671,7 +671,7 @@ function checkBoardState() {
     let allFilled = true;
     let allCorrect = true;
     let hasErrors = false;
-    
+
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
             const userValue = gameState.userValues[row][col];
@@ -686,7 +686,7 @@ function checkBoardState() {
             }
         }
     }
-    
+
     return { allFilled, allCorrect, hasErrors };
 }
 
@@ -699,7 +699,7 @@ function checkCompletion() {
     // If all cells are filled, trigger validation
     if (allFilled) {
         gameState.showErrors = true;
-        
+
         if (allCorrect) {
             // Puzzle completed correctly!
             gameState.isCompleted = true;
@@ -708,7 +708,7 @@ function checkCompletion() {
         } else {
             statusElement.textContent = '❌ Some numbers are incorrect';
         }
-        
+
         renderBoard();
         saveGameState();
     }
@@ -719,15 +719,15 @@ function checkCompletion() {
  */
 function validateBoard() {
     gameState.showErrors = true;
-    
+
     const { hasErrors } = checkBoardState();
-    
+
     if (hasErrors) {
         statusElement.textContent = '❌ Some numbers are incorrect';
     } else {
         statusElement.textContent = '✓ All entered numbers are correct';
     }
-    
+
     renderBoard();
     saveGameState();
 }
@@ -756,7 +756,7 @@ function hideContextMenu() {
 function startTimer() {
     stopTimer();
     gameState.startTime = Date.now() - gameState.elapsedTime;
-    
+
     timerInterval = setInterval(() => {
         if (!gameState.isCompleted) {
             gameState.elapsedTime = Date.now() - gameState.startTime;
@@ -818,7 +818,7 @@ function loadGameState() {
         if (!saved) return false;
 
         const parsed = JSON.parse(saved);
-        
+
         gameState.puzzle = parsed.puzzle;
         gameState.solution = parsed.solution;
         gameState.userValues = parsed.userValues;
@@ -830,14 +830,14 @@ function loadGameState() {
         gameState.showErrors = parsed.showErrors || false;
 
         difficultySelect.value = gameState.difficulty;
-        
+
         if (gameState.isCompleted) {
             statusElement.textContent = '🎉 Completed!';
         }
-        
+
         renderBoard();
         updateTimerDisplay();
-        
+
         if (!gameState.isCompleted) {
             startTimer();
         }

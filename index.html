@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>Sudoku</h1>
-        
+
         <div class="controls">
             <div class="difficulty-selector">
                 <label for="difficulty">Difficulty:</label>
@@ -21,6 +21,8 @@
             </div>
             <button id="new-game" class="btn">New Game</button>
             <button id="reset-game" class="btn">Reset</button>
+        </div>
+        <div class="controls">
             <button id="clear-notes" class="btn">Clear Notes</button>
             <button id="validate" class="btn btn-validate">Validate</button>
         </div>
@@ -36,10 +38,9 @@
             <h3>Instructions:</h3>
             <ul>
                 <li><strong>Click</strong> a cell to select it, then press 1-9 to toggle possible numbers</li>
-                <li><strong>Shift + Click</strong> or press a number twice quickly to enter the final number</li>
-                <li><strong>Double-press Ctrl, Alt, or Cmd</strong> to auto-fill possible numbers for selected cell</li>
+                <li><strong>Shift + Click</strong> or <strong>press a number twice</strong> to enter the final number</li>
+                <li><strong>Double-click</strong> a cell or <strong>Double-press Ctrl, Alt, or Cmd</strong> in a cell to auto-fill numbers</li>
                 <li><strong>Ctrl+Enter</strong> or <strong>Cmd+Enter</strong> to validate the board</li>
-                <li><strong>Double-click</strong> a cell to auto-fill possible numbers (or insert the final number if it's the last empty cell in row/column/square)</li>
                 <li><strong>Right-click</strong> a cell for context menu with auto-fill option</li>
                 <li>Press <strong>Delete</strong> or <strong>Backspace</strong> to clear a cell</li>
             </ul>
