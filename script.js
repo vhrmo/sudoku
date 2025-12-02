@@ -182,11 +182,11 @@ function generatePuzzle(solution, difficulty) {
     const cellsToRemove = DIFFICULTY_LEVELS[difficulty].cellsToRemove;
     
     // Create array of all cell positions and shuffle
-    const positions = [];
+    let positions = [];
     for (let i = 0; i < 81; i++) {
         positions.push(i);
     }
-    shuffleArray(positions);
+    positions = shuffleArray(positions);
 
     // Remove cells
     let removed = 0;
@@ -657,5 +657,4 @@ function exportPuzzleAsJSON() {
     };
 }
 
-// Expose export function globally for debugging
-window.exportPuzzleAsJSON = exportPuzzleAsJSON;
+
