@@ -5,6 +5,8 @@
 
 // Constants
 const STORAGE_KEY = 'sudoku_game_state';
+const THEME_STORAGE_KEY = 'sudoku_theme';
+const THEMES = ['light', 'dark', 'ocean'];
 const DIFFICULTY_LEVELS = {
     low: { cellsToRemove: 30, name: 'Low' },
     medium: { cellsToRemove: 45, name: 'Medium' },
@@ -35,6 +37,81 @@ let difficultySelect;
 let timerElement;
 let statusElement;
 let contextMenu;
+let themeToggle;
+
+/**
+ * Get current theme from localStorage or default to 'light'
+ * @returns {string} Current theme name
+ */
+function getCurrentTheme() {
+    try {
+        return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+    } catch (e) {
+        return 'light';
+    }
+}
+
+/**
+ * Save theme to localStorage
+ * @param {string} theme - Theme name to save
+ */
+function saveTheme(theme) {
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (e) {
+        console.error('Failed to save theme:', e);
+    }
+}
+
+/**
+ * Apply theme to the document
+ * @param {string} theme - Theme name to apply
+ */
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.removeAttribute('data-theme');
+    } else {
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+    updateThemeIcon(theme);
+}
+
+/**
+ * Update the theme toggle icon based on current theme
+ * @param {string} theme - Current theme name
+ */
+function updateThemeIcon(theme) {
+    const lightIcon = document.getElementById('theme-icon-light');
+    const darkIcon = document.getElementById('theme-icon-dark');
+    const oceanIcon = document.getElementById('theme-icon-ocean');
+    
+    if (!lightIcon || !darkIcon || !oceanIcon) return;
+    
+    lightIcon.style.display = theme === 'light' ? 'block' : 'none';
+    darkIcon.style.display = theme === 'dark' ? 'block' : 'none';
+    oceanIcon.style.display = theme === 'ocean' ? 'block' : 'none';
+}
+
+/**
+ * Toggle to the next theme
+ */
+function toggleTheme() {
+    const currentTheme = getCurrentTheme();
+    const currentIndex = THEMES.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % THEMES.length;
+    const nextTheme = THEMES[nextIndex];
+    
+    applyTheme(nextTheme);
+    saveTheme(nextTheme);
+}
+
+/**
+ * Initialize theme from localStorage
+ */
+function initializeTheme() {
+    const savedTheme = getCurrentTheme();
+    applyTheme(savedTheme);
+}
 
 /**
  * Initialize the game when DOM is loaded
@@ -45,6 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
     timerElement = document.getElementById('timer');
     statusElement = document.getElementById('status');
     contextMenu = document.getElementById('context-menu');
+    themeToggle = document.getElementById('theme-toggle');
+
+    // Initialize theme
+    initializeTheme();
 
     // Set up event listeners
     document.getElementById('new-game').addEventListener('click', startNewGame);
@@ -54,6 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
     difficultySelect.addEventListener('change', (e) => {
         gameState.difficulty = e.target.value;
     });
+
+    // Theme toggle event listener
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
 
     // Context menu event listeners
     document.getElementById('auto-fill-cell').addEventListener('click', () => {
