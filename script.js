@@ -21,7 +21,8 @@ let gameState = {
     difficulty: 'low',
     startTime: null,
     elapsedTime: 0,
-    isCompleted: false
+    isCompleted: false,
+    showErrors: false
 };
 
 let timerInterval = null;
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('new-game').addEventListener('click', startNewGame);
     document.getElementById('reset-game').addEventListener('click', resetGame);
     document.getElementById('clear-notes').addEventListener('click', clearAllNotes);
+    document.getElementById('validate').addEventListener('click', validateBoard);
     difficultySelect.addEventListener('change', (e) => {
         gameState.difficulty = e.target.value;
     });
@@ -216,6 +218,7 @@ function startNewGame() {
     gameState.startTime = Date.now();
     gameState.elapsedTime = 0;
     gameState.isCompleted = false;
+    gameState.showErrors = false;
 
     statusElement.textContent = '';
     
@@ -234,6 +237,7 @@ function resetGame() {
     gameState.startTime = Date.now();
     gameState.elapsedTime = 0;
     gameState.isCompleted = false;
+    gameState.showErrors = false;
 
     statusElement.textContent = '';
     
@@ -290,8 +294,8 @@ function createCellElement(index, row, col) {
         cell.classList.add('user-value');
         cell.innerHTML = `<span class="main-value">${userValue}</span>`;
         
-        // Check if the value is correct
-        if (userValue !== gameState.solution[row][col]) {
+        // Check if the value is correct (only show errors when showErrors is true)
+        if (gameState.showErrors && userValue !== gameState.solution[row][col]) {
             cell.classList.add('error');
         }
     } else if (possibleNums.size > 0) {
@@ -510,21 +514,70 @@ function autoFillPossibleNumbers(index) {
 }
 
 /**
- * Check if the puzzle is completed correctly
+ * Check the board state
+ * @returns {object} Object with allFilled, allCorrect, and hasErrors properties
  */
-function checkCompletion() {
+function checkBoardState() {
+    let allFilled = true;
+    let allCorrect = true;
+    let hasErrors = false;
+    
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
-            if (gameState.userValues[row][col] !== gameState.solution[row][col]) {
-                return;
+            const userValue = gameState.userValues[row][col];
+            if (userValue === 0) {
+                allFilled = false;
+            }
+            if (userValue !== gameState.solution[row][col]) {
+                allCorrect = false;
+                if (userValue !== 0) {
+                    hasErrors = true;
+                }
             }
         }
     }
+    
+    return { allFilled, allCorrect, hasErrors };
+}
 
-    // Puzzle completed!
-    gameState.isCompleted = true;
-    stopTimer();
-    statusElement.textContent = '🎉 Completed!';
+/**
+ * Check if the puzzle is completed correctly
+ */
+function checkCompletion() {
+    const { allFilled, allCorrect } = checkBoardState();
+
+    // If all cells are filled, trigger validation
+    if (allFilled) {
+        gameState.showErrors = true;
+        
+        if (allCorrect) {
+            // Puzzle completed correctly!
+            gameState.isCompleted = true;
+            stopTimer();
+            statusElement.textContent = '🎉 Completed!';
+        } else {
+            statusElement.textContent = '❌ Some numbers are incorrect';
+        }
+        
+        renderBoard();
+        saveGameState();
+    }
+}
+
+/**
+ * Validate the board and show errors
+ */
+function validateBoard() {
+    gameState.showErrors = true;
+    
+    const { hasErrors } = checkBoardState();
+    
+    if (hasErrors) {
+        statusElement.textContent = '❌ Some numbers are incorrect';
+    } else {
+        statusElement.textContent = '✓ All entered numbers are correct';
+    }
+    
     renderBoard();
     saveGameState();
 }
@@ -594,7 +647,8 @@ function saveGameState() {
         selectedCell: gameState.selectedCell,
         difficulty: gameState.difficulty,
         elapsedTime: gameState.elapsedTime,
-        isCompleted: gameState.isCompleted
+        isCompleted: gameState.isCompleted,
+        showErrors: gameState.showErrors
     };
 
     try {
@@ -623,6 +677,7 @@ function loadGameState() {
         gameState.difficulty = parsed.difficulty;
         gameState.elapsedTime = parsed.elapsedTime || 0;
         gameState.isCompleted = parsed.isCompleted || false;
+        gameState.showErrors = parsed.showErrors || false;
 
         difficultySelect.value = gameState.difficulty;
         
