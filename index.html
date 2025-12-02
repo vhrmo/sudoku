@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sudoku</h1>
+        
+        <div class="controls">
+            <div class="difficulty-selector">
+                <label for="difficulty">Difficulty:</label>
+                <select id="difficulty">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <button id="new-game" class="btn">New Game</button>
+            <button id="reset-game" class="btn">Reset</button>
+            <button id="clear-notes" class="btn">Clear Notes</button>
+            <button id="validate" class="btn btn-validate">Validate</button>
+        </div>
+
+        <div class="game-info">
+            <span id="timer">Time: 00:00</span>
+            <span id="status"></span>
+        </div>
+
+        <div id="sudoku-board" class="sudoku-board"></div>
+
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ul>
+                <li><strong>Click</strong> a cell to select it, then press 1-9 to toggle possible numbers</li>
+                <li><strong>Shift + Click</strong> or press a number twice quickly to enter the final number</li>
+                <li><strong>Double-click</strong> a cell to auto-fill possible numbers</li>
+                <li><strong>Right-click</strong> a cell for context menu with auto-fill option</li>
+                <li>Press <strong>Delete</strong> or <strong>Backspace</strong> to clear a cell</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="context-menu" class="context-menu">
+        <div class="menu-item" id="auto-fill-cell">Auto-fill possible numbers</div>
+        <div class="menu-item" id="clear-cell">Clear cell</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
