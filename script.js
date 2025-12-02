@@ -351,11 +351,123 @@ function handleCellClick(index, e) {
 }
 
 /**
- * Handle cell double click - auto-fill possible numbers
+ * Handle cell double click - auto-fill possible numbers or insert final number
+ * If this is the last empty cell in its row, column, or 3x3 square, insert the final number.
+ * Otherwise, auto-fill possible numbers.
  * @param {number} index - Cell index
  */
 function handleCellDoubleClick(index) {
+    const row = Math.floor(index / 9);
+    const col = index % 9;
+
+    // Don't process initial cells or cells with values
+    if (gameState.puzzle[row][col] !== 0 || gameState.userValues[row][col] !== 0) {
+        return;
+    }
+
+    // Check if this is the last empty cell in row, column, or square
+    const isLastInRow = countEmptyCellsInRow(row) === 1;
+    const isLastInCol = countEmptyCellsInColumn(col) === 1;
+    const isLastInSquare = countEmptyCellsInSquare(row, col) === 1;
+
+    if (isLastInRow || isLastInCol || isLastInSquare) {
+        // Find the only valid number for this cell
+        const finalNumber = findFinalNumber(row, col);
+        if (finalNumber !== null) {
+            setFinalValue(index, finalNumber);
+            saveGameState();
+            return;
+        }
+    }
+
+    // Default behavior: auto-fill possible numbers
     autoFillPossibleNumbers(index);
+}
+
+/**
+ * Count empty cells in a row
+ * @param {number} row - Row index
+ * @returns {number} Number of empty cells in the row
+ */
+function countEmptyCellsInRow(row) {
+    let count = 0;
+    for (let col = 0; col < 9; col++) {
+        if (gameState.userValues[row][col] === 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+/**
+ * Count empty cells in a column
+ * @param {number} col - Column index
+ * @returns {number} Number of empty cells in the column
+ */
+function countEmptyCellsInColumn(col) {
+    let count = 0;
+    for (let row = 0; row < 9; row++) {
+        if (gameState.userValues[row][col] === 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+/**
+ * Count empty cells in a 3x3 square
+ * @param {number} row - Row index of a cell in the square
+ * @param {number} col - Column index of a cell in the square
+ * @returns {number} Number of empty cells in the square
+ */
+function countEmptyCellsInSquare(row, col) {
+    const boxRow = Math.floor(row / 3) * 3;
+    const boxCol = Math.floor(col / 3) * 3;
+    let count = 0;
+    for (let r = boxRow; r < boxRow + 3; r++) {
+        for (let c = boxCol; c < boxCol + 3; c++) {
+            if (gameState.userValues[r][c] === 0) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+/**
+ * Find the only valid number for a cell (used when it's the last empty cell in a group)
+ * @param {number} row - Row index
+ * @param {number} col - Column index
+ * @returns {number|null} The final number if found, null otherwise
+ */
+function findFinalNumber(row, col) {
+    const possible = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+    // Remove numbers in the same row
+    for (let c = 0; c < 9; c++) {
+        possible.delete(gameState.userValues[row][c]);
+    }
+
+    // Remove numbers in the same column
+    for (let r = 0; r < 9; r++) {
+        possible.delete(gameState.userValues[r][col]);
+    }
+
+    // Remove numbers in the same 3x3 box
+    const boxRow = Math.floor(row / 3) * 3;
+    const boxCol = Math.floor(col / 3) * 3;
+    for (let r = boxRow; r < boxRow + 3; r++) {
+        for (let c = boxCol; c < boxCol + 3; c++) {
+            possible.delete(gameState.userValues[r][c]);
+        }
+    }
+
+    // If exactly one number is possible, return it
+    if (possible.size === 1) {
+        return Array.from(possible)[0];
+    }
+
+    return null;
 }
 
 /**
