@@ -547,6 +547,10 @@ function togglePossibleNumber(index, num) {
     const row = Math.floor(index / 9);
     const col = index % 9;
 
+    // Hide validation result when entering a new value
+    gameState.showErrors = false;
+    statusElement.textContent = '';
+
     // Clear the final value if there is one
     if (gameState.userValues[row][col] !== 0) {
         gameState.userValues[row][col] = 0;
@@ -569,6 +573,10 @@ function togglePossibleNumber(index, num) {
 function setFinalValue(index, num) {
     const row = Math.floor(index / 9);
     const col = index % 9;
+
+    // Hide validation result when entering a new value
+    gameState.showErrors = false;
+    statusElement.textContent = '';
 
     gameState.userValues[row][col] = num;
     gameState.possibleNumbers[index].clear();
