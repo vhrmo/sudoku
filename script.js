@@ -380,11 +380,30 @@ function handleKeyDown(e) {
     const index = gameState.selectedCell;
     const row = Math.floor(index / 9);
     const col = index % 9;
+    const key = e.key;
+    const isInitialCell = gameState.puzzle[row][col] !== 0;
+
+    // Handle arrow key navigation (works on all cells including pre-filled ones)
+    let newSelectedCell = null;
+    if (key === 'ArrowUp' && row > 0) {
+        newSelectedCell = index - 9;
+    } else if (key === 'ArrowDown' && row < 8) {
+        newSelectedCell = index + 9;
+    } else if (key === 'ArrowLeft' && col > 0) {
+        newSelectedCell = index - 1;
+    } else if (key === 'ArrowRight' && col < 8) {
+        newSelectedCell = index + 1;
+    }
+
+    if (newSelectedCell !== null) {
+        gameState.selectedCell = newSelectedCell;
+        renderBoard();
+        saveGameState();
+        return;
+    }
 
     // Don't allow editing initial cells
-    if (gameState.puzzle[row][col] !== 0) return;
-
-    const key = e.key;
+    if (isInitialCell) return;
 
     if (key >= '1' && key <= '9') {
         const num = parseInt(key);
@@ -402,18 +421,6 @@ function handleKeyDown(e) {
         lastKeyPress = { key, time: now };
     } else if (key === 'Delete' || key === 'Backspace') {
         clearCell(index);
-    } else if (key === 'ArrowUp' && row > 0) {
-        gameState.selectedCell = index - 9;
-        renderBoard();
-    } else if (key === 'ArrowDown' && row < 8) {
-        gameState.selectedCell = index + 9;
-        renderBoard();
-    } else if (key === 'ArrowLeft' && col > 0) {
-        gameState.selectedCell = index - 1;
-        renderBoard();
-    } else if (key === 'ArrowRight' && col < 8) {
-        gameState.selectedCell = index + 1;
-        renderBoard();
     }
 
     saveGameState();
