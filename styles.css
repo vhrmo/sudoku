@@ -5,7 +5,7 @@
     --color-primary-end: #764ba2;
     --color-success-start: #28a745;
     --color-success-end: #20c997;
-    
+
     /* Background colors */
     --bg-body-gradient: linear-gradient(135deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
     --bg-container: #ffffff;
@@ -19,7 +19,7 @@
     --bg-info: #f8f9fa;
     --bg-menu: #ffffff;
     --bg-menu-hover: #f0f0f0;
-    
+
     /* Text colors */
     --text-primary: #333333;
     --text-secondary: #555555;
@@ -28,29 +28,29 @@
     --text-user-value: #2563eb;
     --text-success: #28a745;
     --text-btn: #ffffff;
-    
+
     /* Border colors */
     --border-color: #333333;
     --border-input: #dddddd;
     --border-input-focus: var(--color-primary-start);
-    
+
     /* Shadow colors */
     --shadow-container: rgba(0, 0, 0, 0.3);
     --shadow-btn: rgba(102, 126, 234, 0.4);
     --shadow-btn-success: rgba(40, 167, 69, 0.4);
     --shadow-menu: rgba(0, 0, 0, 0.2);
-    
+
     /* Layout sizes */
-    --container-max-width: 680px;
+    --container-max-width: 1800px;
     --container-padding: 30px;
     --container-radius: 16px;
-    --board-max-width: 450px;
+    --board-max-width: 550px;
     --board-radius: 8px;
     --board-border-width: 3px;
     --cell-gap: 1px;
     --btn-padding: 10px 20px;
     --btn-radius: 8px;
-    
+
     /* Typography */
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     --font-size-title: 2.5rem;
@@ -68,7 +68,7 @@
     --color-primary-end: #6b46c1;
     --color-success-start: #38a169;
     --color-success-end: #319795;
-    
+
     /* Background colors */
     --bg-body-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
     --bg-container: #2d3748;
@@ -82,7 +82,7 @@
     --bg-info: #3d4a5c;
     --bg-menu: #2d3748;
     --bg-menu-hover: #4a5568;
-    
+
     /* Text colors */
     --text-primary: #e2e8f0;
     --text-secondary: #cbd5e0;
@@ -91,12 +91,12 @@
     --text-user-value: #63b3ed;
     --text-success: #68d391;
     --text-btn: #ffffff;
-    
+
     /* Border colors */
     --border-color: #e2e8f0;
     --border-input: #4a5568;
     --border-input-focus: var(--color-primary-start);
-    
+
     /* Shadow colors */
     --shadow-container: rgba(0, 0, 0, 0.5);
     --shadow-btn: rgba(90, 103, 216, 0.4);
@@ -111,7 +111,7 @@
     --color-primary-end: #00b4d8;
     --color-success-start: #2a9d8f;
     --color-success-end: #40c9a2;
-    
+
     /* Background colors */
     --bg-body-gradient: linear-gradient(135deg, #caf0f8 0%, #90e0ef 100%);
     --bg-container: #ffffff;
@@ -125,7 +125,7 @@
     --bg-info: #e0f7fa;
     --bg-menu: #ffffff;
     --bg-menu-hover: #e0f7fa;
-    
+
     /* Text colors */
     --text-primary: #01579b;
     --text-secondary: #0277bd;
@@ -134,12 +134,12 @@
     --text-user-value: #0077b6;
     --text-success: #2a9d8f;
     --text-btn: #ffffff;
-    
+
     /* Border colors */
     --border-color: #0077b6;
     --border-input: #b2ebf2;
     --border-input-focus: var(--color-primary-start);
-    
+
     /* Shadow colors */
     --shadow-container: rgba(0, 119, 182, 0.2);
     --shadow-btn: rgba(0, 119, 182, 0.4);
@@ -172,6 +172,10 @@ body {
     max-width: var(--container-max-width);
     width: 100%;
     transition: background 0.3s ease, box-shadow 0.3s ease;
+    display: grid;
+    grid-template-columns: 350px 1fr 350px;
+    gap: 20px;
+    align-items: start;
 }
 
 /* Header with title and theme toggle */
@@ -180,7 +184,8 @@ body {
     justify-content: center;
     align-items: center;
     position: relative;
-    margin-bottom: 20px;
+    grid-column: 1 / -1;
+    margin-bottom: 0;
 }
 
 h1 {
@@ -472,6 +477,13 @@ h1 {
 }
 
 /* Responsive adjustments */
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr;
+        max-width: 680px;
+    }
+}
+
 @media (max-width: 500px) {
     :root {
         --container-padding: 15px;

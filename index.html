@@ -23,29 +23,32 @@
             </button>
         </div>
 
-        <div class="controls">
-            <div class="difficulty-selector">
-                <label for="difficulty">Difficulty:</label>
-                <select id="difficulty">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
+        <div class="left-panel">
+            <div class="controls">
+                <div class="difficulty-selector">
+                    <label for="difficulty">Difficulty:</label>
+                    <select id="difficulty">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <button id="new-game" class="btn">New Game</button>
             </div>
-            <button id="new-game" class="btn">New Game</button>
-            <button id="reset-game" class="btn">Reset</button>
-        </div>
-        <div class="controls">
-            <button id="clear-notes" class="btn">Clear Notes</button>
-            <button id="validate" class="btn btn-validate">Validate</button>
-        </div>
-
-        <div class="game-info">
-            <span id="timer">Time: 00:00</span>
-            <span id="status"></span>
+            <div class="controls">
+                <button id="reset-game" class="btn">Reset</button>
+                <button id="clear-notes" class="btn">Clear Notes</button>
+                <button id="validate" class="btn btn-validate">Validate</button>
+            </div>
         </div>
 
-        <div id="sudoku-board" class="sudoku-board"></div>
+        <div class="center-panel">
+            <div class="game-info">
+                <span id="timer">Time: 00:00</span>
+                <span id="status"></span>
+            </div>
+            <div id="sudoku-board" class="sudoku-board"></div>
+        </div>
 
         <div class="instructions">
             <h3>Instructions:</h3>
