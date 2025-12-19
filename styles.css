@@ -297,6 +297,7 @@ h1 {
     max-width: var(--board-max-width);
     margin: 0 auto 20px;
     transition: background 0.3s ease;
+    line-height: 1.2rem;
 }
 
 #timer {

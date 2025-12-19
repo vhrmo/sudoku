@@ -84,9 +84,9 @@ function updateThemeIcon(theme) {
     const lightIcon = document.getElementById('theme-icon-light');
     const darkIcon = document.getElementById('theme-icon-dark');
     const oceanIcon = document.getElementById('theme-icon-ocean');
-    
+
     if (!lightIcon || !darkIcon || !oceanIcon) return;
-    
+
     lightIcon.style.display = theme === 'light' ? 'block' : 'none';
     darkIcon.style.display = theme === 'dark' ? 'block' : 'none';
     oceanIcon.style.display = theme === 'ocean' ? 'block' : 'none';
@@ -100,7 +100,7 @@ function toggleTheme() {
     const currentIndex = THEMES.indexOf(currentTheme);
     const nextIndex = (currentIndex + 1) % THEMES.length;
     const nextTheme = THEMES[nextIndex];
-    
+
     applyTheme(nextTheme);
     saveTheme(nextTheme);
 }
@@ -750,43 +750,106 @@ function autoFillPossibleNumbers(index) {
 }
 
 /**
- * Check the board state
- * @returns {object} Object with allFilled, allCorrect, and hasErrors properties
+ * Check if a given board is a valid Sudoku solution
+ * A valid solution must have all cells filled and satisfy Sudoku constraints:
+ * - Each row contains digits 1-9 without repetition
+ * - Each column contains digits 1-9 without repetition
+ * - Each 3x3 box contains digits 1-9 without repetition
+ * @param {number[][]} board - The board to validate
+ * @returns {boolean} Whether the board is a valid Sudoku solution
  */
-function checkBoardState() {
-    let allFilled = true;
-    let allCorrect = true;
-    let hasErrors = false;
-
+function isValidSudokuSolution(board) {
+    // Check if all cells are filled
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
-            const userValue = gameState.userValues[row][col];
-            if (userValue === 0) {
-                allFilled = false;
+            if (board[row][col] === 0) {
+                return false;
             }
-            if (userValue !== gameState.solution[row][col]) {
-                allCorrect = false;
-                if (userValue !== 0) {
-                    hasErrors = true;
+        }
+    }
+
+    // Check rows
+    for (let row = 0; row < 9; row++) {
+        const seen = new Set();
+        for (let col = 0; col < 9; col++) {
+            const num = board[row][col];
+            if (num < 1 || num > 9 || seen.has(num)) {
+                return false;
+            }
+            seen.add(num);
+        }
+    }
+
+    // Check columns
+    for (let col = 0; col < 9; col++) {
+        const seen = new Set();
+        for (let row = 0; row < 9; row++) {
+            const num = board[row][col];
+            if (num < 1 || num > 9 || seen.has(num)) {
+                return false;
+            }
+            seen.add(num);
+        }
+    }
+
+    // Check 3x3 boxes
+    for (let boxRow = 0; boxRow < 9; boxRow += 3) {
+        for (let boxCol = 0; boxCol < 9; boxCol += 3) {
+            const seen = new Set();
+            for (let row = boxRow; row < boxRow + 3; row++) {
+                for (let col = boxCol; col < boxCol + 3; col++) {
+                    const num = board[row][col];
+                    if (num < 1 || num > 9 || seen.has(num)) {
+                        return false;
+                    }
+                    seen.add(num);
                 }
             }
         }
     }
 
-    return { allFilled, allCorrect, hasErrors };
+    return true;
+}
+
+/**
+ * Check the board state
+ * @returns {object} Object with allFilled, isValid, and hasErrors properties
+ */
+function checkBoardState() {
+    let allFilled = true;
+    let hasErrors = false;
+
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            const puzzleValue = gameState.puzzle[row][col];
+            const userValue = gameState.userValues[row][col];
+            if (userValue === 0) {
+                allFilled = false;
+            }
+            // Check for invalid values only for cells the user has filled (not pre-filled puzzle cells)
+            if (puzzleValue === 0 && userValue !== 0 && !isValidPlacement(gameState.userValues, row, col, userValue)) {
+                hasErrors = true;
+            }
+        }
+    }
+
+    // Check if the completed board is a valid Sudoku solution
+    const isValid = allFilled && isValidSudokuSolution(gameState.userValues);
+
+    return { allFilled, isValid, hasErrors };
 }
 
 /**
  * Check if the puzzle is completed correctly
  */
 function checkCompletion() {
-    const { allFilled, allCorrect } = checkBoardState();
+    const { allFilled, isValid } = checkBoardState();
 
     // If all cells are filled, trigger validation
     if (allFilled) {
         gameState.showErrors = true;
 
-        if (allCorrect) {
+        if (isValid) {
             // Puzzle completed correctly!
             gameState.isCompleted = true;
             stopTimer();
@@ -806,12 +869,16 @@ function checkCompletion() {
 function validateBoard() {
     gameState.showErrors = true;
 
-    const { hasErrors } = checkBoardState();
+    const { allFilled, isValid, hasErrors } = checkBoardState();
 
-    if (hasErrors) {
+    if (allFilled && isValid) {
+        statusElement.textContent = '✓ Valid solution!';
+    } else if (hasErrors) {
         statusElement.textContent = '❌ Some numbers are incorrect';
+    } else if (!allFilled) {
+        statusElement.textContent = '⚠ Board not yet complete';
     } else {
-        statusElement.textContent = '✓ All entered numbers are correct';
+        statusElement.textContent = '❌ Invalid solution';
     }
 
     renderBoard();
